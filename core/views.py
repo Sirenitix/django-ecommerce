@@ -16,9 +16,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.views.generic import ListView, DetailView, View
-from django.views.i18n import set_language
 
-from djecommerce.settings.base import BASE_DIR
 from .forms import CheckoutForm, CouponForm, RefundForm, PaymentForm
 from .models import Item, OrderItem, Order, Address, Payment, Coupon, Refund, UserProfile, CATEGORY_CHOICES
 
@@ -65,11 +63,6 @@ def payment(request):
     return HttpResponse(message)
 
 
-def products(request):
-    context = {
-        'items': Item.objects.all()
-    }
-    return render(request, "products.html", context)
 
 
 def search_products(request):
@@ -452,8 +445,31 @@ class OrderSummaryView(LoginRequiredMixin, View):
             return redirect("/")
 
 
+def products(request, slug):
+    print(django.utils.translation.get_language())
+    if django.utils.translation.get_language() == 'ru':
+        context = {
+            'object': Item.objects.using('users').get(slug=slug)
+        }
+    else:
+        context = {
+            'object': Item.objects.using('default').get(slug=slug)
+        }
+    return render(request, "product.html", context)
+
+
 class ItemDetailView(DetailView):
+    print(django.utils.translation.get_language())
     model = Item
+    try:
+        if django.utils.translation.get_language == 'ru':
+            def get_queryset(self):
+                return Item.objects.using('default')
+        else:
+            def get_queryset(self):
+                return Item.objects.using('users')
+    except:
+        print("boom")
     template_name = "product.html"
 
 

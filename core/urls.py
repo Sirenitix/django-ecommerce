@@ -14,7 +14,7 @@ from .views import (
     PaymentView,
     AddCouponView,
     RequestRefundView,
-    search_products, search_category, category_view, payment, changelang
+    search_products, search_category, category_view, payment, changelang, products
 )
 
 
@@ -31,7 +31,7 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('checkout/', CheckoutView.as_view(), name='checkout'),
     path('order-summary/', OrderSummaryView.as_view(), name='order-summary'),
-    path('product/<slug>/', ItemDetailView.as_view(), name='product'),
+    path('product/<slug>/', products, name='product'),
     path('search/', search_products, name='search-products'),
     path('category/search/automotive', search_category, name='automotive-category-search'),
     path('category/search/electrical', search_category, name='electrical-category-search'),
