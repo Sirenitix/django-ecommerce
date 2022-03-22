@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load mathfilters %}
+{% block content %}
+
+  <main>
+    <div class="container">
+
+      <!--Navbar-->
+      <nav class="navbar navbar-expand-lg navbar-dark aqua-gradient lighten-3 mt-3 mb-5">
+
+        <!-- Navbar brand -->
+        <span class="navbar-brand">{% trans "Categories:" %}</span>
+
+        <!-- Collapse button -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav"
+          aria-controls="basicExampleNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Collapsible content -->
+        <div class="collapse navbar-collapse" id="basicExampleNav">
+
+          <!-- Links -->
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">{% trans "All" %}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:automotive' %}">{% trans "Automotive"%}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:electrical' %}">{% trans "Electrical"%}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:handtools' %}">{% trans "Hand Tools"%}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:homehardware' %}">{% trans "Home Hardware"%}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'core:lighting' %}">{% trans "Lighting"%}</a>
+            </li>
+          </ul>
+
+          <!-- Links -->
+
+          <form action="{% url 'core:search-products' %}" method="POST" class="form-inline">
+              {% csrf_token %}
+            <div>
+              <input class="form-control mr-sm-2" name="title" type="text" placeholder="{% trans "Search" %}" aria-label="Search">
+            </div>
+          </form>
+        </div>
+        <!-- Collapsible content -->
+
+      </nav>
+      <!--/.Navbar-->
+
+      <!--Section: Products v.3-->
+      <section class="text-center mb-4">
+
+        <div class="row wow fadeIn">
+
+          {% for item in object_list %}
+          <div class="col-lg-3 col-md-6 mb-4">
+
+            <div class="card">
+
+              <div class="view overlay">
+                {% comment %} <img src="https://mdbootstrap.com/img/Photos/Horizontal/E-commerce/Vertical/12.jpg" class="card-img-top" {% endcomment %}
+                <img src="{{ item.image.url }}" class="card-img-top">
+                <a href="{{ item.get_absolute_url }}">
+                  <div class="mask rgba-white-slight"></div>
+                </a>
+              </div>
+
+              <div class="card-body text-center">
+                <a href="" class="grey-text">
+                  <h5> {{ item.get_category_display }} </h5>
+                </a>
+               {% if item.discount_price != 0%}
+                <h5>
+                  <strong>
+                    <a href="{{ item.get_absolute_url }}" class="dark-grey-text">{{ item.title }}
+                      <span class="badge badge-pill {{ item.get_label_display }}-color">{% trans "Discount" %} {{ item.price|sub:item.discount_price|mul:100|div:item.price|floatformat }}%</span>
+                    </a>
+                  </strong>
+
+                </h5>
+               {% endif %}
+
+                <h4 class="font-weight-bold blue-text">
+                  <strong>$
+                  {% if item.discount_price %}
+                  {{ item.discount_price }}
+                  {% else %}
+                  {{ item.price }}
+                  {% endif %}
+                  </strong>
+                </h4>
+
+              </div>
+
+            </div>
+
+          </div>
+          {% endfor %}
+        </div>
+
+      </section>
+      <!--Section: Products v.3-->
+
+      <!--Pagination-->
+
+      {% if is_paginated %}
+          <nav aria-label="Page navigation conatiner"></nav>
+          <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li><a href="?page={{ page_obj.previous_page_number }}" class="page-link">&laquo; {% trans "prev" %} </a></li>
+            {% endif %}
+             <span class="current page-link" style="text-align: center">
+                {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}.
+            </span>
+            {% if page_obj.has_next %}
+            <li><a href="?page={{ page_obj.next_page_number }}" class="page-link"> {% trans "next"%} &raquo;</a></li>
+
+            {% endif %}
+          </ul>
+          </nav>
+        </div>
+      {% endif %}
+
+    </div>
+  </main>
+
+{% endblock content %}
+
+

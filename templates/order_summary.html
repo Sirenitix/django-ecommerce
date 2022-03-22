@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <main>
+    <div class="container">
+    <br>
+    <div class="table-responsive text-nowrap">
+    <h2>{% trans "Order Summary" %}</h2>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">{% trans "#" %}</th>
+            <th scope="col">{% trans "Item title" %}</th>
+            <th scope="col">{% trans "Price" %}</th>
+            <th scope="col">{% trans "Quantity" %}</th>
+            <th scope="col">{% trans "Total Item Price" %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for order_item in object.items.all %}
+        <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ order_item.item.title }}</td>
+            <td>{{ order_item.item.price }}</td>
+            <td>
+                <a href="{% url 'core:remove-single-item-from-cart' order_item.item.slug %}"><i class="fas fa-minus mr-2"></i></a>
+                {{ order_item.quantity }}
+                <a href="{% url 'core:add-to-cart' order_item.item.slug %}"><i class="fas fa-plus ml-2"></i></a>
+            </td>
+            <td>
+            {% if order_item.item.discount_price %}
+                ${{ order_item.get_total_discount_item_price }}
+                <span class="badge badge-primary">Saving ${{ order_item.get_amount_saved }}</span>
+            {% else %}
+                ${{ order_item.get_total_item_price }}
+            {% endif %}
+            <a style='color: red;' href="{% url 'core:remove-from-cart' order_item.item.slug %}">
+                <i class="fas fa-trash float-right"></i>
+            </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan='5'>{% trans "Your cart is empty" %}</td>
+        </tr>
+        <tr>
+            <td colspan="5">
+            <a class='btn btn-primary float-right' href='/'>{% trans "Continue shopping" %}</a>
+            </td>
+        </tr>
+        {% endfor %}
+        {% if object.coupon %}
+        <tr>
+            <td colspan="4"><b>Coupon</b></td>
+            <td><b>-${{ object.coupon.amount }}</b></td>
+        </tr>
+        {% endif %}
+        {% if object.get_total %}
+        <tr>
+            <td colspan="4"><b>{% trans "Order Total" %}</b></td>
+            <td><b>${{ object.get_total }}</b></td>
+        </tr>
+        <tr>
+            <td colspan="5">
+            <div style="text-align: center;"><a class='btn btn-primary' style="width: 67%; font-size: 15px; color: white; font-weight: bold;" href="/" >{% trans "Continue shopping" %}</a></div>
+            </td>
+        </tr>
+        {% endif %}
+
+        </tbody>
+    </table>
+
+    </div>
+     <div  id="paypal-button-container" align="center"></div>
+     <script src="https://www.paypal.com/sdk/js?client-id=AcuTYjkk7Ih_mkzjFfFK5PLRIzGHNuMml98tIgYwLMl0Oo2RqbXEA7uTXKQbjzbFqn-i-iQbvHO9d25m&currency=USD"></script>
+        <script>
+             var a = "{{object.get_total}}";
+             var transaction;
+             var user = "{{object.user}}";
+        // Render the PayPal button into #paypal-button-container
+        paypal.Buttons({
+
+             style: {
+                color:  'blue',
+                shape:  'pill',
+                label:  'pay'
+            },
+
+            // Set up the transaction
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: a
+                        }
+                    }]
+                });
+            },
+
+            // Finalize the transaction
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(orderData) {
+                    // Successful capture! For demo purposes:
+                    console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                    transaction = orderData.purchase_units[0].payments.captures[0];
+                    alert('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
+
+                    // Replace the above to show a success message within this page, e.g.
+                    // const element = document.getElementById('paypal-button-container');
+                    // element.innerHTML = '';
+                    // element.innerHTML = '<h3>Thank you for your payment!</h3>';
+                    // Or go to another URL:  actions.redirect('thank_you.html');
+                     function getCookie(name) {
+                        var cookieValue = null;
+                        if (document.cookie && document.cookie !== '') {
+                            var cookies = document.cookie.split(';');
+                            for (var i = 0; i < cookies.length; i++) {
+                                var cookie = jQuery.trim(cookies[i]);
+                                // Does this cookie string begin with the name we want?
+                                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                    break;
+                                }
+                            }
+                        }
+                        return cookieValue;}
+                    $( document ).ready(function() {
+                     function onchange (evt) {
+                       $.ajax({
+                         url: '/payment/',
+                         data: {
+                             'transaction_id' : transaction.id,
+                             'amount' : a,
+                             'user': user},
+                         type: 'POST',
+                            headers: {
+                     "X-CSRFToken": getCookie("csrftoken")
+                        }
+                       }).done(function(response){
+                         console.log(response);
+                           });
+                         }
+
+                     window.onblur = onchange;
+
+                   });
+
+                });
+            }
+
+
+
+
+        }).render('#paypal-button-container');
+
+        </script>
+
+    </div>
+
+  </main>
+
+{% endblock content %}
+
+
