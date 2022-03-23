@@ -23,16 +23,16 @@ from .models import Item, OrderItem, Order, Address, Payment, Coupon, Refund, Us
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
-def changelang(request):
-    if request.method == 'POST':
-        message = 'successful'
-        if request.POST['lang'] == 'ru':
-            print(request.POST['lang'])
-
-        else:
-            print(request.POST['lang'])
-
-    return HttpResponse(message)
+# def changelang(request):
+#     if request.method == 'POST':
+#         message = 'successful'
+#         if request.POST['lang'] == 'ru':
+#             print(request.POST['lang'])
+#
+#         else:
+#             print(request.POST['lang'])
+#
+#     return HttpResponse(message)
 
 
 def handler404(request, exception):
@@ -54,13 +54,7 @@ def create_ref_code():
 def payment(request):
     if request.method == 'POST':
         print(request.POST['user'] + " " + request.POST['transaction_id'] + " " + request.POST['amount'])
-        if django.utils.translation.get_language() == 'en':
-            payment = Payment.objects.using('default')
-        else:
-            if django.utils.translation.get_language() == 'ru':
-                payment = Payment.objects.using('users')
-            else:
-                payment = Payment.objects.using('some')
+        payment = Payment()
         payment.stripe_charge_id = request.POST['transaction_id']
         payment.user = request.user
         payment.amount = float(request.POST['amount'])
@@ -491,7 +485,6 @@ def ordersummary(request):
 
 
 def products(request, slug):
-    print(django.utils.translation.get_language())
     if django.utils.translation.get_language() == 'en':
         context = {
             'object': Item.objects.using('default').get(slug=slug)
@@ -510,17 +503,16 @@ def products(request, slug):
 
 
 class ItemDetailView(DetailView):
-    print(django.utils.translation.get_language())
     model = Item
     try:
         if django.utils.translation.get_language == 'ru':
             def get_queryset(self):
-                return Item.objects.using('default')
+                return Item.objects.using('users')
         else:
             def get_queryset(self):
-                return Item.objects.using('users')
+                return Item.objects.using('default')
     except:
-        print("boom")
+        error = 'error'
     template_name = "product.html"
 
 

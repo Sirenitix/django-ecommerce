@@ -76,7 +76,7 @@
      <div  id="paypal-button-container" align="center"></div>
      <script src="https://www.paypal.com/sdk/js?client-id=AcuTYjkk7Ih_mkzjFfFK5PLRIzGHNuMml98tIgYwLMl0Oo2RqbXEA7uTXKQbjzbFqn-i-iQbvHO9d25m&currency=USD"></script>
         <script>
-             var a = "{{object.get_total}}";
+             var a = parseInt("{{object.get_total}}");
              var transaction;
              var user = "{{object.user}}";
         // Render the PayPal button into #paypal-button-container

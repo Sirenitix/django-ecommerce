@@ -12,7 +12,7 @@ from .views import (
     PaymentView,
     AddCouponView,
     RequestRefundView,
-    search_products, search_category, category_view, payment, changelang, products, ordersummary, home_view
+    search_products, search_category, category_view, payment,  products, ordersummary, home_view
 )
 
 
@@ -47,7 +47,7 @@ urlpatterns = [
     path('remove-item-from-cart/<slug>/', remove_single_item_from_cart,
          name='remove-single-item-from-cart'),
     path('payment/<payment_option>/', PaymentView.as_view(), name='payment'),
-    path('changelang/', changelang, name='changelang'),
+    # path('changelang/', changelang, name='changelang'),
     path('request-refund/', RequestRefundView.as_view(), name='request-refund'),
     url(r'^payment/', payment),
     url(r'^media/(?P<path>.*)$', serve, {'document_root':

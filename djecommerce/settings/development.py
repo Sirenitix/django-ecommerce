@@ -1,13 +1,15 @@
 from .base import *
 
 DEBUG = False
-ALLOWED_HOSTS = ['127.0.0.1']
-
+ALLOWED_HOSTS = ['*']
+CORS_ORIGIN_ALLOW_ALL = True
 INSTALLED_APPS += [
-    'debug_toolbar'
+    'debug_toolbar',
+    'corsheaders'
 ]
 
-MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware',
+               'corsheaders.middleware.CorsMiddleware', ]
 
 # DEBUG TOOLBAR SETTINGS
 
