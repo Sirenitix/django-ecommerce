@@ -1,6 +1,6 @@
 from .base import *
 
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['127.0.0.1']
 
 INSTALLED_APPS += [
@@ -44,6 +44,10 @@ DATABASES = {
     'users': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'ru.sqlite3'),
+    },
+    'some': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'kz.sqlite3'),
     }
 }
 

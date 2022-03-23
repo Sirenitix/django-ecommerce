@@ -4,17 +4,15 @@ from django.urls import path, include
 from djecommerce.settings.base import *
 from django.views.static import serve
 from .views import (
-    ItemDetailView,
     CheckoutView,
     HomeView,
-    OrderSummaryView,
     add_to_cart,
     remove_from_cart,
     remove_single_item_from_cart,
     PaymentView,
     AddCouponView,
     RequestRefundView,
-    search_products, search_category, category_view, payment, changelang, products
+    search_products, search_category, category_view, payment, changelang, products, ordersummary, home_view
 )
 
 
@@ -28,9 +26,9 @@ handler404 = 'core.views.handler404'
 
 
 urlpatterns = [
-    path('', HomeView.as_view(), name='home'),
+    path('', home_view, name='home'),
     path('checkout/', CheckoutView.as_view(), name='checkout'),
-    path('order-summary/', OrderSummaryView.as_view(), name='order-summary'),
+    path('order-summary/', ordersummary, name='order-summary'),
     path('product/<slug>/', products, name='product'),
     path('search/', search_products, name='search-products'),
     path('category/search/automotive', search_category, name='automotive-category-search'),

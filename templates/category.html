@@ -157,7 +157,7 @@
 
               <div class="card-body text-center">
                 <a href="" class="grey-text">
-                  <h5>{{ item.get_category_display }}</h5>
+                  <h5>{{ item.transcat }}</h5>
                 </a>
               {% if item.discount_price != 0 %}
                 <h5>
@@ -201,9 +201,11 @@
             {% endif %}
             </li>
             <li>
+                {% if object_list.number != None %}
             <a href="#" class="current page-link" style="text-align: center; display: inline; pointer-events: none; cursor: default;">
-                {% trans "Page" %} {{ object_list.number }} {% trans "of" %} {{ object_list.paginator.num_pages }}.
+                {% trans "Page" %} {{ object_list.number }} {% trans "of" %} {{ object_list.paginator.num_pages }}
             </a>
+                {% endif %}
             </li>
             <li>
             {% if object_list.has_next %}

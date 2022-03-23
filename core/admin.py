@@ -67,6 +67,19 @@ class App1ModelAdmin(admin.ModelAdmin):
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         return super().formfield_for_manytomany(db_field, request, using=self.using, **kwargs)
 
+class App2ModelAdmin(admin.ModelAdmin):
+    using = 'some'
+    def save_model(self, request, obj, form, change):
+        obj.save(using=self.using)
+    def delete_model(self, request, obj):
+        obj.delete(using=self.using)
+    def get_queryset(self, request):
+        return super().get_queryset(request).using(self.using)
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        return super().formfield_for_foreignkey(db_field, request, using=self.using, **kwargs)
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        return super().formfield_for_manytomany(db_field, request, using=self.using, **kwargs)
+
 
 admin.site.register(Item)
 admin.site.register(OrderItem)
@@ -79,4 +92,8 @@ admin.site.register(UserProfile)
 
 othersite = admin.AdminSite('othersite')
 othersite.register(Item, App1ModelAdmin)
+othersite.register(Payment, App1ModelAdmin)
 
+anothersite = admin.AdminSite('anothersite')
+anothersite.register(Item, App2ModelAdmin)
+anothersite.register(Payment, App2ModelAdmin)

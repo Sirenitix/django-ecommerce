@@ -78,7 +78,7 @@
 
               <div class="card-body text-center">
                 <a href="" class="grey-text">
-                  <h5> {{ item.get_category_display }} </h5>
+                  <h5> {{ item.transcat }} </h5>
                 </a>
                {% if item.discount_price != 0%}
                 <h5>
@@ -114,23 +114,25 @@
 
       <!--Pagination-->
 
-      {% if is_paginated %}
-          <nav aria-label="Page navigation conatiner"></nav>
-          <ul class="pagination justify-content-center">
-            {% if page_obj.has_previous %}
-            <li><a href="?page={{ page_obj.previous_page_number }}" class="page-link">&laquo; {% trans "prev" %} </a></li>
+       <ul class="pagination justify-content-center">
+            <li>
+            {% if object_list.has_previous %}
+                <a href="?page=1" class="page-link" style="display: inline; text-align: center"> {% trans "first" %}</a>
+                <a href="?page={{ object_list.previous_page_number }}" class="page-link" style="display: inline; text-align: center">&laquo;{% trans "previous" %}</a>
             {% endif %}
-             <span class="current page-link" style="text-align: center">
-                {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}.
-            </span>
-            {% if page_obj.has_next %}
-            <li><a href="?page={{ page_obj.next_page_number }}" class="page-link"> {% trans "next"%} &raquo;</a></li>
-
+            </li>
+            <li>
+            <a href="#" class="current page-link" style="text-align: center; display: inline; pointer-events: none; cursor: default;">
+                {% trans "Page" %} {{ object_list.number }} {% trans "of" %} {{ object_list.paginator.num_pages }}
+            </a>
+            </li>
+            <li>
+            {% if object_list.has_next %}
+                <a href="?page={{ object_list.next_page_number }}" class="page-link" style="display: inline; text-align: center">{% trans "next" %}&raquo; </a>
+                <a href="?page={{ object_list.paginator.num_pages }}" class="page-link" style="display: inline; text-align: center">{% trans "last" %} </a>
             {% endif %}
-          </ul>
-          </nav>
-        </div>
-      {% endif %}
+            </li>
+        </ul>
 
     </div>
   </main>

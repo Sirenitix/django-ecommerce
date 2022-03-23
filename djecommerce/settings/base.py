@@ -1,10 +1,13 @@
 import os
 from decouple import config
 
+
 BASE_DIR = os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))))
 
 SECRET_KEY = config('SECRET_KEY')
+
+DATABASE_ROUTERS = ['djecommerce.PrimaryReplicaRouter.PrimaryReplicaRouter']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -57,7 +60,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djecommerce.wsgi.application'
 
-LANGUAGE_CODE = 'ru'
+LANGUAGE_CODE = 'en'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
@@ -98,13 +101,10 @@ from django.utils.translation import ugettext_lazy as _
 LANGUAGES = (
     ('en', _('English')),
     ('ru', _('Russian')),
+    ('kk', _('Kazakh')),
 )
+
 
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'locale/'),
 )
-
-
-
-
-

@@ -47,6 +47,7 @@ class Item(models.Model):
     description = models.TextField()
     image = models.ImageField()
     fullDescription = models.TextField()
+    transcat = models.TextField()
 
     def __str__(self):
         return self.title

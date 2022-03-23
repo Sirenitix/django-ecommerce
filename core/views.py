@@ -29,7 +29,7 @@ def changelang(request):
         if request.POST['lang'] == 'ru':
             print(request.POST['lang'])
 
-        if request.POST['lang'] == 'en':
+        else:
             print(request.POST['lang'])
 
     return HttpResponse(message)
@@ -54,7 +54,13 @@ def create_ref_code():
 def payment(request):
     if request.method == 'POST':
         print(request.POST['user'] + " " + request.POST['transaction_id'] + " " + request.POST['amount'])
-        payment = Payment()
+        if django.utils.translation.get_language() == 'en':
+            payment = Payment.objects.using('default')
+        else:
+            if django.utils.translation.get_language() == 'ru':
+                payment = Payment.objects.using('users')
+            else:
+                payment = Payment.objects.using('some')
         payment.stripe_charge_id = request.POST['transaction_id']
         payment.user = request.user
         payment.amount = float(request.POST['amount'])
@@ -63,16 +69,17 @@ def payment(request):
     return HttpResponse(message)
 
 
-
-
 def search_products(request):
     if request.method == "POST":
         query_name = request.POST.get('title', None)
         if query_name:
-            if django.utils.translation.get_language() == 'ru':
-                results = Item.objects.using('users').filter(title__contains=query_name).order_by('-price')
+            if django.utils.translation.get_language() == 'en':
+                results = Item.objects.using('default').filter(title__iregex=query_name).order_by('-price')
             else:
-                result = Item.objects.using('default').filter(title__contains=query_name).order_by('-price')
+                if django.utils.translation.get_language() == 'ru':
+                    results = Item.objects.using('users').filter(title__iregex=query_name).order_by('-price')
+                else:
+                    results = Item.objects.using('some').filter(title__iregex=query_name).order_by('-price')
             return render(request, 'home.html', {'object_list': results})
 
     return render(request, 'home.html')
@@ -85,8 +92,17 @@ def search_category(request):
             w.capitalize() for w in request.path.replace("/category/search/", "").replace("_", " ").split())
         CATEGORIES_D = {v: k for k, v in CATEGORY_CHOICES}
         if query_name:
-            results = Item.objects.filter(title__contains=query_name).filter(
+            if django.utils.translation.get_language() == 'en':
+                results = Item.objects.using('default').filter(title__iregex=query_name).filter(
                 category__contains=CATEGORIES_D.get(parameter)).order_by('-price')
+            else:
+                if django.utils.translation.get_language() == 'ru':
+                    results = Item.objects.using('users').filter(title__iregex=query_name).filter(
+                        category__contains=CATEGORIES_D.get(parameter)).order_by('-price')
+                else:
+                    results = Item.objects.using('some').filter(title__iregex=query_name).filter(
+                        category__contains=CATEGORIES_D.get(parameter)).order_by('-price')
+
             return render(request, 'category.html', {'object_list': results})
 
     return render(request, 'category.html')
@@ -414,13 +430,36 @@ class HomeView(ListView):
     template_name = "home.html"
 
 
+def home_view(request):
+    if django.utils.translation.get_language() == 'en':
+        results = Item.objects.using('default').order_by('price')
+    else:
+        if django.utils.translation.get_language() == 'kk':
+            results = Item.objects.using('some').order_by('price')
+        else:
+            results = Item.objects.using('users').order_by('price')
+
+    page = request.GET.get('page')
+    paginator = Paginator(results, 4)
+    try:
+        results = paginator.page(page)
+    except PageNotAnInteger:
+        results = paginator.page(1)
+    except EmptyPage:
+        results = paginator.page(paginator.num_pages)
+    return render(request, 'home.html', {'object_list': results})
+
+
 def category_view(request):
     parameter = " ".join(w.capitalize() for w in request.path.replace("/caregory/", "").replace("_", " ").split())
     CATEGORIES_D = {v: k for k, v in CATEGORY_CHOICES}
-    if django.utils.translation.get_language() == 'ru':
-        results = Item.objects.using('users').filter(category__contains=CATEGORIES_D.get(parameter)).order_by('price')
-    else:
+    if django.utils.translation.get_language() == 'en':
         results = Item.objects.using('default').filter(category__contains=CATEGORIES_D.get(parameter)).order_by('price')
+    else:
+        if django.utils.translation.get_language() == 'ru':
+            results = Item.objects.using('users').filter(category__contains=CATEGORIES_D.get(parameter)).order_by('price')
+        else:
+            results = Item.objects.using('some').filter(category__contains=CATEGORIES_D.get(parameter)).order_by('price')
     page = request.GET.get('page')
     paginator = Paginator(results, 8)
     try:
@@ -432,29 +471,41 @@ def category_view(request):
     return render(request, 'category.html', {'object_list': results})
 
 
-class OrderSummaryView(LoginRequiredMixin, View):
-    def get(self, *args, **kwargs):
-        try:
-            order = Order.objects.get(user=self.request.user, ordered=False)
-            context = {
-                'object': order
-            }
-            return render(self.request, 'order_summary.html', context)
-        except ObjectDoesNotExist:
-            messages.warning(self.request, "You do not have an active order")
-            return redirect("/")
+def ordersummary(request):
+    try:
+        if django.utils.translation.get_language() == 'en':
+            order = Order.objects.using('default').get(user=request.user, ordered=False)
+        else:
+            if django.utils.translation.get_language() == 'ru':
+                order = Order.objects.using('users').get(user=request.user, ordered=False)
+            else:
+                order = Order.objects.using('some').get(user=request.user, ordered=False)
+
+        context = {
+            'object': order
+        }
+        return render(request, 'order_summary.html', context)
+    except ObjectDoesNotExist:
+        messages.warning(request, "You do not have an active order")
+        return redirect("/")
 
 
 def products(request, slug):
     print(django.utils.translation.get_language())
-    if django.utils.translation.get_language() == 'ru':
-        context = {
-            'object': Item.objects.using('users').get(slug=slug)
-        }
-    else:
+    if django.utils.translation.get_language() == 'en':
         context = {
             'object': Item.objects.using('default').get(slug=slug)
         }
+    else:
+        if django.utils.translation.get_language() == 'ru':
+            context = {
+                'object': Item.objects.using('users').get(slug=slug)
+            }
+        else:
+            context = {
+                'object': Item.objects.using('some').get(slug=slug)
+            }
+
     return render(request, "product.html", context)
 
 
@@ -475,13 +526,35 @@ class ItemDetailView(DetailView):
 
 @login_required
 def add_to_cart(request, slug):
-    item = get_object_or_404(Item, slug=slug)
-    order_item, created = OrderItem.objects.get_or_create(
-        item=item,
-        user=request.user,
-        ordered=False
-    )
-    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    if django.utils.translation.get_language() == 'en':
+        item = get_object_or_404(Item.objects.using('default'), slug=slug)
+        order_item, created = OrderItem.objects.using('default').get_or_create(
+            item=item,
+            user=request.user,
+            ordered=False
+        )
+    else:
+        if django.utils.translation.get_language() == 'ru':
+            item = get_object_or_404(Item.objects.using('users').filter(slug=slug))
+            order_item, created = OrderItem.objects.using('users').get_or_create(
+                item=item,
+                user=request.user,
+                ordered=False
+            )
+        else:
+            item = get_object_or_404(Item.objects.using('some'), slug=slug)
+            order_item, created = OrderItem.objects.using('some').get_or_create(
+                item=item,
+                user=request.user,
+                ordered=False
+            )
+    if django.utils.translation.get_language() == 'en':
+        order_qs = Order.objects.using('default').filter(user=request.user, ordered=False)
+    else:
+        if django.utils.translation.get_language() == 'ru':
+            order_qs = Order.objects.using('users').filter(user=request.user, ordered=False)
+        else:
+            order_qs = Order.objects.using('some').filter(user=request.user, ordered=False)
     if order_qs.exists():
         order = order_qs[0]
         # check if the order item is in the order
@@ -496,29 +569,68 @@ def add_to_cart(request, slug):
             return redirect("core:order-summary")
     else:
         ordered_date = timezone.now()
-        order = Order.objects.create(
-            user=request.user, ordered_date=ordered_date)
-        order.items.add(order_item)
+        if django.utils.translation.get_language() == 'en':
+            order = Order.objects.using('default').create(
+                user=request.user, ordered_date=ordered_date)
+            order.items.add(order_item)
+        else:
+            if django.utils.translation.get_language() == 'ru':
+                order = Order.objects.using('users').create(
+                    user=request.user, ordered_date=ordered_date)
+                order.items.add(order_item)
+            elif django.utils.translation.get_language() == 'kk':
+                order = Order.objects.using('some').create(
+                    user=request.user, ordered_date=ordered_date)
+                order.items.add(order_item)
         messages.info(request, "This item was added to your cart.")
         return redirect("core:order-summary")
 
 
 @login_required
 def remove_from_cart(request, slug):
-    item = get_object_or_404(Item, slug=slug)
-    order_qs = Order.objects.filter(
-        user=request.user,
-        ordered=False
-    )
+    if django.utils.translation.get_language() == 'en':
+        item = get_object_or_404(Item.objects.using('default'), slug=slug)
+        order_qs = Order.objects.using('default').filter(
+            user=request.user,
+            ordered=False
+        )
+    else:
+        if django.utils.translation.get_language() == 'ru':
+            item = get_object_or_404(Item.objects.using('users'), slug=slug)
+            order_qs = Order.objects.using('users').filter(
+                user=request.user,
+                ordered=False
+            )
+        else:
+            item = get_object_or_404(Item.objects.using('some'), slug=slug)
+            order_qs = Order.objects.using('some').filter(
+                user=request.user,
+                ordered=False
+            )
+
     if order_qs.exists():
         order = order_qs[0]
         # check if the order item is in the order
         if order.items.filter(item__slug=item.slug).exists():
-            order_item = OrderItem.objects.filter(
-                item=item,
-                user=request.user,
-                ordered=False
-            )[0]
+            if django.utils.translation.get_language() == 'en':
+                order_item = OrderItem.objects.using('default').filter(
+                    item=item,
+                    user=request.user,
+                    ordered=False
+                )[0]
+            else:
+                if django.utils.translation.get_language() == 'ru':
+                    order_item = OrderItem.objects.using('users').filter(
+                        item=item,
+                        user=request.user,
+                        ordered=False
+                    )[0]
+                else:
+                    order_item = OrderItem.objects.using('some').filter(
+                        item=item,
+                        user=request.user,
+                        ordered=False
+                    )[0]
             order.items.remove(order_item)
             order_item.delete()
             messages.info(request, "This item was removed from your cart.")
@@ -533,11 +645,26 @@ def remove_from_cart(request, slug):
 
 @login_required
 def remove_single_item_from_cart(request, slug):
-    item = get_object_or_404(Item, slug=slug)
-    order_qs = Order.objects.filter(
-        user=request.user,
-        ordered=False
-    )
+    if django.utils.translation.get_language() == 'en':
+        item = get_object_or_404(Item.objects.using('default'), slug=slug)
+        order_qs = Order.objects.using('default').filter(
+            user=request.user,
+            ordered=False
+        )
+    else:
+        if django.utils.translation.get_language() == 'ru':
+            item = get_object_or_404(Item.objects.using('users'), slug=slug)
+            order_qs = Order.objects.using('users').filter(
+                user=request.user,
+                ordered=False
+            )
+        else:
+            item = get_object_or_404(Item.objects.using('some'), slug=slug)
+            order_qs = Order.objects.using('some').filter(
+                user=request.user,
+                ordered=False
+            )
+
     if order_qs.exists():
         order = order_qs[0]
         # check if the order item is in the order
