@@ -6,11 +6,9 @@ from django_countries.fields import CountryField
 
 
 CATEGORY_CHOICES = (
-    ('A', 'Automotive'),
-    ('E', 'Electrical'),
-    ('HT', 'Hand Tools'),
-    ('HH', 'Home Hardware'),
-    ('L', 'Lighting')
+    ('WF', 'Walls And Foundation'),
+    ('RF', 'Roof And Facade'),
+    ('FD', 'Finishing And Decor')
 )
 
 
