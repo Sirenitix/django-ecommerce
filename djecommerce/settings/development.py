@@ -3,6 +3,11 @@ from .base import *
 DEBUG = False
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = (
+       'http://172.105.130.102:8000',
+)
+
+
 INSTALLED_APPS += [
     'debug_toolbar',
     'corsheaders'

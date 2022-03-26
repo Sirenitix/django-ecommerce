@@ -107,11 +107,6 @@
                     transaction = orderData.purchase_units[0].payments.captures[0];
                     alert('Transaction '+ transaction.status + ': ' + transaction.id + '\n\nSee console for all available details');
 
-                    // Replace the above to show a success message within this page, e.g.
-                    // const element = document.getElementById('paypal-button-container');
-                    // element.innerHTML = '';
-                    // element.innerHTML = '<h3>Thank you for your payment!</h3>';
-                    // Or go to another URL:  actions.redirect('thank_you.html');
                      function getCookie(name) {
                         var cookieValue = null;
                         if (document.cookie && document.cookie !== '') {
@@ -126,8 +121,9 @@
                             }
                         }
                         return cookieValue;}
+
                     $( document ).ready(function() {
-                     function onchange (evt) {
+
                        $.ajax({
                          url: '/payment/',
                          data: {
@@ -141,7 +137,7 @@
                        }).done(function(response){
                          console.log(response);
                            });
-                         }
+
 
                      window.onblur = onchange;
 
