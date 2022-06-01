@@ -1,5 +1,6 @@
 import os
 from decouple import config
+import django-heroku
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(
@@ -71,6 +72,7 @@ ALLOWED_HOSTS=['*']
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+django-heroku.settings(locals())
 
 
 # Static files (CSS, JavaScript, Images)
