@@ -1,16 +1,12 @@
 import os
-import environ
-
-env = environ.Env()
-
-# read th .env file
-environ.Env.read_env()
+from dotenv import load_dotenv
+load_dotenv()
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))))
 
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
 DATABASE_ROUTERS = ['djecommerce.PrimaryReplicaRouter.PrimaryReplicaRouter']
 
