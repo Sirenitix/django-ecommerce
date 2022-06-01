@@ -1,5 +1,9 @@
 import os
-from decouple import config
+from decouple iimport environ
+import environ
+
+env = environ.Env()
+environ.Env.read_env()mport config
 
 
 
@@ -8,7 +12,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(
 
 
 KEY = 't#zu_ynpfg^vydb&h1fdg)@$awcgt17*inr+5mv(uludzlu_'
-SECRET_KEY = config(KEY)
+SECRET_KEY = env("SECRET_KEY")
 
 DATABASE_ROUTERS = ['djecommerce.PrimaryReplicaRouter.PrimaryReplicaRouter']
 
