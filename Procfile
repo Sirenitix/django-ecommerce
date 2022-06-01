@@ -1,1 +1,1 @@
-gunicorn  djecommerce:application -b 0.0.0.0:8000
+web: gunicorn djecommerce.wsgi
