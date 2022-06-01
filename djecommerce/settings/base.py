@@ -1,5 +1,4 @@
 import os
-import django-heroku
 from decouple import config
 
 
@@ -72,8 +71,6 @@ USE_TZ = True
 ALLOWED_HOSTS=['*']
 
 CORS_ORIGIN_ALLOW_ALL = True
-
-django-heroku.settings(locals())
 
 
 # Static files (CSS, JavaScript, Images)
