@@ -1,5 +1,5 @@
 import os
-from decouple iimport environ
+from decouple import environ
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(
