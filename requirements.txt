@@ -30,3 +30,4 @@ django-cors-headers==3.6.0
 
 gunicorn==19.4.1
 python-dotenv==0.20.0
+django-rosetta==0.9.8
