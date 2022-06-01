@@ -1,1 +1,1 @@
-web: gunicorn djecommerce.wsgi --log-file -ecommerce
+web: gunicorn djecommerce.wsgi --access-logfile - --workers 3
