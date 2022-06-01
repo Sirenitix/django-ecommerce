@@ -1,1 +1,1 @@
-web: gunicorn djecommerce/wsgi.py 
+web: gunicorn djecommerce.wsgi
