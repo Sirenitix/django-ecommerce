@@ -1,12 +1,12 @@
 import os
 from decouple import config
 
-
+SECRET_KEY = config('t#zu_ynpfg^vydb&h1fdg)@$awcgt17*inr+5mv(uludzlu_')
 
 BASE_DIR = os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__))))
 
-
+SECRET_KEY = config('SECRET_KEY')
 
 DATABASE_ROUTERS = ['djecommerce.PrimaryReplicaRouter.PrimaryReplicaRouter']
 
